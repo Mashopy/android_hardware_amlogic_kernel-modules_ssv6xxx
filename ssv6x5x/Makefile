@@ -1,6 +1,6 @@
 PLATFORMS = ssv6x5x
 
-KBUILD_TOP := $(PWD)/hardware/wifi/icomm/drivers/ssv6xxx/ssv6x5x
+KBUILD_TOP := $(srctree)/$(src)
 include $(KBUILD_TOP)/$(PLATFORMS).cfg
 include $(KBUILD_TOP)/platform-config.mak
 
@@ -21,6 +21,7 @@ else
 KMODULE_NAME=ssv6051
 endif
 EXTRA_CFLAGS := -I$(KBUILD_TOP) -I$(KBUILD_TOP)/include
+EXTRA_CFLAGS += -Wno-unused-but-set-variable -Wno-pointer-sign
 
 DEF_PARSER_H = $(KBUILD_TOP)/include/ssv_conf_parser.h
 $(shell env ccflags="$(ccflags-y)" $(KBUILD_TOP)/parser-conf.sh $(DEF_PARSER_H))
@@ -114,7 +115,7 @@ obj-$(CONFIG_SSV6X5X) += $(KMODULE_NAME).o
 all:module strip
 
 module:
-	make  -C $(SSV_KERNEL_PATH) ARCH=$(SSV_ARCH) CROSS_COMPILE=$(SSV_CROSS) \
+	make  -C $(SSV_KERNEL_PATH) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) \
 	EXTRA_CFLAGS="$(EXTRA_CFLAGS)" M=$(PWD) modules
 
 install:
@@ -124,19 +125,9 @@ uninstall:
 	rm -f $(KMODDESTDIR)/$(KMODULE_NAME).ko
     
 strip:
-	#cp eagle.ko $(KO_NAME).ko
-	#cp $(KO_NAME).ko $(DEFAULT_MODULES_DIR)
-	#cp ssv6200.ko $(DEFAULT_MODULES_DIR)
-	cp platforms/$(PLATFORMS)-wifi.cfg image/$(KMODULE_NAME)-wifi.cfg
-	cp $(KMODULE_NAME).ko image/$(KMODULE_NAME).ko
-	cp platforms/cli image
-ifneq ($(SSV_STRIP),)
-	cp $(KMODULE_NAME).ko image/$(KMODULE_NAME)_ori.ko
-	$(SSV_STRIP) --strip-unneeded image/$(KMODULE_NAME).ko
-	#$(SSV_STRIP) --strip-debug image/$(KMODULE_NAME).ko
-endif
+	$(CROSS_COMPILE)strip --strip-unneeded $(KMODULE_NAME).ko
 
 clean:
-	make -C $(SSV_KERNEL_PATH) ARCH=$(SSV_ARCH) CROSS_COMPILE=$(SSV_CROSS) \
+	make -C $(SSV_KERNEL_PATH) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) \
 	M=$(PWD) clean
 

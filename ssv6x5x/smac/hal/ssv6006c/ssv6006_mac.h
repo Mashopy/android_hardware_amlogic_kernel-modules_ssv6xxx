@@ -109,7 +109,7 @@ enum ssv6006_lpbk_type {
     MAX_SSV6006_CMD_LPBK_TYPE
 };
 #define DEFAULT_CFG_BIN_NAME "/tmp/flash.bin"
-#define SEC_CFG_BIN_NAME "/system/etc/wifi/ssv6x5x/flash.bin"
+#define SEC_CFG_BIN_NAME "/vendor/etc/wifi/ssv6x5x/flash.bin"
 #define SSV6006_HW_SEC_TABLE_SIZE sizeof(struct ssv6006_hw_sec)
 #define SSV6006_HW_KEY_SIZE 32
 #define SSV6006_PAIRWISE_KEY_OFFSET 12

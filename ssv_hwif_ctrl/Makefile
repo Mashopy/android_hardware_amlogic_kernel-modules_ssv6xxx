@@ -1,6 +1,6 @@
 PLATFORMS = ssv6051
 
-KBUILD_TOP := $(PWD)/hardware/wifi/icomm/drivers/ssv6xxx/ssv_hwif_ctrl
+KBUILD_TOP := $(srctree)/$(src)
 include $(KBUILD_TOP)/$(PLATFORMS).cfg
 include $(KBUILD_TOP)/platform-config.mak
 
@@ -15,11 +15,12 @@ CFGDIR = $(PWD)/../../../../config
 
 endif
 EXTRA_CFLAGS := -I$(KBUILD_TOP) -I$(KBUILD_TOP)/include
+EXTRA_CFLAGS += -Wno-pointer-sign
 KMODULE_NAME=ssv_hwif_ctrl
 
 
-KBUILD_EXTRA_SYMBOLS += $(KBUILD_TOP)/../ssv6051/Module.symvers
-KBUILD_EXTRA_SYMBOLS += $(KBUILD_TOP)/../ssv6x5x/Module.symvers
+KBUILD_EXTRA_SYMBOLS += $(M)/../ssv6051/Module.symvers
+KBUILD_EXTRA_SYMBOLS += $(M)/../ssv6x5x/Module.symvers
 
 KERN_SRCS := hwif_ctrl/sdio/sdio.c
 
@@ -32,7 +33,7 @@ obj-m+= $(KMODULE_NAME).o
 all:module strip
 
 module:
-	make  -C $(SSV_KERNEL_PATH) ARCH=$(SSV_ARCH) CROSS_COMPILE=$(SSV_CROSS) \
+	make  -C $(SSV_KERNEL_PATH) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) \
 	EXTRA_CFLAGS="$(EXTRA_CFLAGS)" M=$(PWD) modules
 
 install:
@@ -42,19 +43,9 @@ uninstall:
 	rm -f $(KMODDESTDIR)/$(KMODULE_NAME).ko
     
 strip:
-	#cp eagle.ko $(KO_NAME).ko
-	#cp $(KO_NAME).ko $(DEFAULT_MODULES_DIR)
-	#cp ssv6200.ko $(DEFAULT_MODULES_DIR)
-	cp platforms/$(PLATFORMS)-wifi.cfg image/$(KMODULE_NAME)-wifi.cfg
-	cp $(KMODULE_NAME).ko image/$(KMODULE_NAME).ko
-	cp platforms/cli image
-ifneq ($(SSV_STRIP),)
-	cp $(KMODULE_NAME).ko image/$(KMODULE_NAME)_ori.ko
-	$(SSV_STRIP) --strip-unneeded image/$(KMODULE_NAME).ko
-	#$(SSV_STRIP) --strip-debug image/$(KMODULE_NAME).ko
-endif
+	$(CROSS_COMPILE)strip --strip-unneeded $(KMODULE_NAME).ko
 
 clean:
-	make -C $(SSV_KERNEL_PATH) ARCH=$(SSV_ARCH) CROSS_COMPILE=$(SSV_CROSS) \
+	make -C $(SSV_KERNEL_PATH) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) \
 	M=$(PWD) clean
 
